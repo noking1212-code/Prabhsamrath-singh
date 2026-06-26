@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  content     String   @db.Text
+  thumbnail   String?
+  liveUrl     String?
+  githubUrl   String?
+  techStack   String[]
+  featured    Boolean  @default(false)
+  status      Status   @default(DRAFT)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  media       Media[]
+}
+
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String   @db.Text
+  coverImage  String?
+  published   Boolean  @default(false)
+  views       Int      @default(0)
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Timeline {
+  id          String   @id @default(cuid())
+  title       String
+  company     String?
+  description String
+  date        DateTime
+  icon        String?
+  createdAt   DateTime @default(now())
+}
+
+model CurrentFocus {
+  id        String   @id @default(cuid())
+  title     String
+  status    String
+  progress  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Badge {
+  id        String   @id @default(cuid())
+  name      String
+  issuer    String
+  url       String?
+  icon      String?
+  earnedAt  DateTime
+}
+
+model Progress {
+  id          String   @id @default(cuid())
+  category    String
+  metric      String
+  value       Int
+  target      Int
+  updatedAt   DateTime @updatedAt
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  value         String   @db.Text
+  updatedAt     DateTime @updatedAt
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  event     String
+  path      String
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
